@@ -25,6 +25,7 @@ def genBatch(data):
     rollback = rollbackTemplate % (player[0])
     todo.append(insert)
     undo.append(rollback)
+  # undo[0] = insertVertexTemplate
   # todo[1] = insertVertexTemplate
   return todo, undo
 
