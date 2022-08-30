@@ -95,15 +95,24 @@ if __name__ == "__main__":
   config = Config()
   config.max_connection_pool_size = 10
   conn = ConnectionPool()
-  status = conn.init([('127.0.0.1', 18588)], config)
+  # IP and port of the nebula-graphd service
+  addr = '127.0.0.1'
+  port = 18588
+  # The default login
+  usr = 'root'
+  pwd = 'nebula'
+  # Initialize the connection pool
+  status = conn.init([(addr, port)], config)
   if status:
-    with conn.session_context('root', 'nebula') as session:
+    with conn.session_context(usr, pwd) as session:
       progress = exeBatch('nba', todo, session)
       if (progress != len(todo)):
         if rollback(undo, progress, session) == False:
-          raise Exception("Rollback failed.")
+          logging.error("Rollback failed.")
         else:
-          logging.info("Bacth insert failed, with all inserted vertices rolled back.")
+          logging.warning("Bacth insert failed, with all inserted vertices rolled back.")
       else:
         logging.info("Batch insert succeeded.")
+  else:
+    logging.error("Connection pool initialization failed.")
   conn.close()
