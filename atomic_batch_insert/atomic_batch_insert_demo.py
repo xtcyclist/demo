@@ -3,7 +3,6 @@
 from nebula3.gclient.net import ConnectionPool
 from nebula3.Config import Config
 import csv
-import sys
 import logging
 
 # Query template for todo queries
@@ -38,7 +37,7 @@ def genBatch(data):
     undo.append(rollback)
   # Ingest some errors for testing:
   # undo[0] = insertVertexTemplate
-  # todo[4] = insertVertexTemplate
+  todo[4] = insertVertexTemplate
   return todo, undo
 
 # Execute the given query multiple times.
@@ -50,6 +49,7 @@ def exeQueryWithRetries(query, session):
     return result
   i = 0
   while i < retryTimes:
+    logging.info("Executing %s." % query)
     result = session.execute(query)
     if not result.is_succeeded():
       i = i + 1
@@ -71,6 +71,8 @@ def exeBatch(space, batch, session):
     result = exeQueryWithRetries(query, session)
     if result == None:
       return counter
+    else:
+      counter = counter + 1
   return counter
 
 # Rollback the batch execution by executing the undo counterparts of all successfully executed queries.
@@ -81,6 +83,8 @@ def rollback(undo, progress, session):
     if result == None:
       logging.error("Rollback failed while executing the %d-th undo statement \"%s\"." % (count, undo[count]))
       return False
+    else:
+      count = count + 1
   if count == progress:
     return True
   else:
@@ -89,18 +93,18 @@ def rollback(undo, progress, session):
 # Main entry
 if __name__ == "__main__":
   # Load data to fill query templates from a csv
-  csvfile = sys.argv[1]
+  csvfile = "players.csv"
   data = readCSV(csvfile)
   todo, undo = genBatch(data)
   config = Config()
   config.max_connection_pool_size = 10
   conn = ConnectionPool()
   # IP and port of the nebula-graphd service
-  addr = '127.0.0.1'
+  addr = "127.0.0.1"
   port = 18588
   # The default login
-  usr = 'root'
-  pwd = 'nebula'
+  usr = "root"
+  pwd = "nebula"
   # Initialize the connection pool
   status = conn.init([(addr, port)], config)
   if status:
