@@ -37,7 +37,7 @@ def genBatch(data):
     undo.append(rollback)
   # Ingest some errors for testing:
   # undo[0] = insertVertexTemplate
-  todo[4] = insertVertexTemplate
+  # todo[4] = insertVertexTemplate
   return todo, undo
 
 # Execute the given query multiple times.
