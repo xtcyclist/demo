@@ -4,6 +4,7 @@ from nebula3.gclient.net import ConnectionPool
 from nebula3.Config import Config
 import csv
 import logging
+import sys
 
 # Query template for todo queries
 insertVertexTemplate = "INSERT VERTEX player(name, age) VALUES \"%s\":(\"%s\", %s)"
